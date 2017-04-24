@@ -1,23 +1,30 @@
 package myprojects.automation.assignment4.tests;
 
 import myprojects.automation.assignment4.BaseTest;
+import myprojects.automation.assignment4.model.ProductData;
 import org.openqa.selenium.By;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class CreateProductTest extends BaseTest {
 
-    @Test
-    public void createNewProduct() {
-        // TODO implement test for product creation
+    @DataProvider(name = "credentials")
+    public Object[][] createData1() {
+        return new Object[][] {
+                { "webinar.test@gmail.com","Xcg7299bnSmMuRLp9ITw"}
+        };
+    }
 
-        // actions.login(login, password);
+    @Test(dataProvider = "credentials")
+    public void createNewProduct(String login, String password) {
+
         log("log in with real credentials");
-        actions.login("webinar.test@gmail.com","Xcg7299bnSmMuRLp9ITw");
+        actions.login(login, password);
         Assert.assertTrue(driver.findElement(By.className("page-title")).getText().contains("Пульт"),"wrong title page");
 
         //create new product
-        actions.createProduct();
+        actions.createProduct(ProductData.generate());
 
         // ...
     }

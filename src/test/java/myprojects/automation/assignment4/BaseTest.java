@@ -70,7 +70,7 @@ public abstract class BaseTest {
      *
      */
     @BeforeClass
-    @Parameters ("browser")
+    @Parameters ("browserChrome")
     // TODO use parameters from pom.xml to pass required browser type
     public void setUp(String browser ) {
         driver = new EventFiringWebDriver(getDriver(browser));
