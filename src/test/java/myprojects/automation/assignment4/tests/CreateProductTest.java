@@ -10,14 +10,14 @@ import org.testng.annotations.Test;
 public class CreateProductTest extends BaseTest {
 
     @DataProvider(name = "credentials")
-    public Object[][] createData1() {
+    public Object[][] loginToAdmin() {
         return new Object[][] {
                 { "webinar.test@gmail.com","Xcg7299bnSmMuRLp9ITw"}
         };
     }
 
     @Test(dataProvider = "credentials")
-    public void createNewProduct(String login, String password) {
+    public void createNewProduct(String login, String password) throws InterruptedException {
 
         log("log in with real credentials");
         actions.login(login, password);
@@ -25,9 +25,9 @@ public class CreateProductTest extends BaseTest {
 
         //create new product
         actions.createProduct(ProductData.generate());
-
-        // ...
     }
 
-    // TODO implement logic to check product visibility on website
+
+
+
 }

@@ -28,8 +28,8 @@ public class GeneralActions extends BaseTest{
     private By nameProductLocator = By.id("form_step1_name_1");
     private By quantityProductLocator = By.id("form_step1_qty_0_shortcut");
     private By priceProductLocator = By.id("form_step1_price_shortcut");
-    private By activeSwitchLocator = By.xpath("//div[@class='switch-input']");
     private By pageBody = By.xpath("//body");
+    private By frontendAllProductLink = By.xpath("//a[contains(@class, 'all-product')]");
 
     public GeneralActions(WebDriver driver) {
         this.driver = driver;
@@ -48,7 +48,7 @@ public class GeneralActions extends BaseTest{
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("main")));
     }
 
-    public void createProduct(ProductData newProduct) {
+    public void createProduct(ProductData newProduct) throws InterruptedException {
         wait.until(ExpectedConditions.visibilityOfElementLocated(catalogueLink));
         WebElement catalogueLink = driver.findElement(this.catalogueLink);
         WebElement productLink = driver.findElement(this.productLink);
@@ -56,6 +56,7 @@ public class GeneralActions extends BaseTest{
         log ("Click the 'Product' item in main menu");
         Actions actions = new Actions(driver);
         actions.moveToElement(catalogueLink).perform();
+        Thread.sleep(2000);
         actions.moveToElement(productLink).perform();
         productLink.click();
 
@@ -98,9 +99,50 @@ public class GeneralActions extends BaseTest{
         //check that confirm message is displayed
         Assert.assertEquals(driver.findElement(By.className("growl-message")).getText(), "Настройки обновлены.","wrong text of message");
 
+        //Check the product on the site
+        log("log in the the frontend");
+        driver.navigate().to(Properties.getBaseUrl());
+
+        //wait to loading the page
+        waitForContentLoad(frontendAllProductLink);
+
+        log("click the All product link");
+        WebElement allProductLink = driver.findElement(frontendAllProductLink);
+        allProductLink.click();
+
+        //wait to loading page
+        waitForContentLoad(By.id("search_filters"));
+
+        log("find the created product on the site");
+        WebElement searchField = driver.findElement(By.className("ui-autocomplete-input"));
+        log("enter name");
+        searchField.sendKeys(newProduct.getName());
+        log("press enter");
+        //searchField.sendKeys(Keys.ENTER);
+        driver.findElement(By.xpath("//button/i")).click();
+
+        log("wait the title of page");
+        waitForContentLoad(By.className("h2"));
+
+        log("Make sure that search page is displayed");
+        WebElement searchPageTitle = driver.findElement(By.className("h2"));
+        Assert.assertEquals(searchPageTitle.getText(), "РЕЗУЛЬТАТЫ ПОИСКА", "Search page isn't opened");
+
+        log("Check the attributes of product");
+        //check the attributes of product
+        Assert.assertEquals(driver.findElement(By.xpath("//h1[@class='h3 product-title']/a")).getText(), newProduct.getName(), "Wrong name of product");
+        WebElement priceAtribute = driver.findElement(By.xpath("//div[@class='product-price-and-shipping']/span"));
+        String priceAttribute1 = priceAtribute.getText();
+        System.out.print(priceAttribute1);
+
+        Assert.assertSame(priceAttribute1, newProduct.getPrice(), "Wrong product price");
     }
 
     public void waitForContentLoad(By locator) {
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    public String cutString (String locator){
+       return locator.substring(0, - 2);
     }
 }

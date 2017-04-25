@@ -2,6 +2,7 @@ package myprojects.automation.assignment4;
 
 import myprojects.automation.assignment4.utils.logging.EventHandler;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -28,31 +29,24 @@ public abstract class BaseTest {
      * @return New instance of {@link WebDriver} object.
      */
     private WebDriver getDriver(String browser) {
-        switch (browser) {
-            case "firefox":
+            if (browser.equalsIgnoreCase("firefox")) {
                 System.setProperty(
                         "webdriver.gecko.driver",
                         getResource("/geckodriver.exe"));
                 return new FirefoxDriver();
-            case "ie":
-            case "internet explorer":
+            } else if (browser.equalsIgnoreCase("internet explorer")) {
                 System.setProperty(
                         "webdriver.ie.driver",
                         getResource("/IEDriverServer.exe"));
                 return new InternetExplorerDriver();
-            case "chrome":
-            default:
+            } else if (browser.equalsIgnoreCase("chrome")) {
                 System.setProperty(
                         "webdriver.chrome.driver",
                         getResource("/chromedriver.exe"));
                 return new ChromeDriver();
-        }
+            }System.out.print("message");
     }
 
-    /**
-     * @param resourceName The name of the resource
-     * @return Path to resource
-     */
     private String getResource(String resourceName) {
         try {
            return Paths.get(BaseTest.class.getResource(resourceName).toURI()).toFile().getPath();
@@ -70,7 +64,7 @@ public abstract class BaseTest {
      *
      */
     @BeforeClass
-    @Parameters ("browserChrome")
+    @Parameters ("browser")
     // TODO use parameters from pom.xml to pass required browser type
     public void setUp(String browser ) {
         driver = new EventFiringWebDriver(getDriver(browser));
