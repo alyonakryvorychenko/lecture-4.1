@@ -39,12 +39,12 @@ public abstract class BaseTest {
                         "webdriver.ie.driver",
                         getResource("/IEDriverServer.exe"));
                 return new InternetExplorerDriver();
-            } else if (browser.equalsIgnoreCase("chrome")) {
+            } else {
                 System.setProperty(
                         "webdriver.chrome.driver",
                         getResource("/chromedriver.exe"));
                 return new ChromeDriver();
-            }System.out.print("message");
+            }
     }
 
     private String getResource(String resourceName) {

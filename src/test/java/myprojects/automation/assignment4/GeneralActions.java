@@ -22,7 +22,7 @@ public class GeneralActions extends BaseTest{
     private WebDriver driver;
     private WebDriverWait wait;
     private By catalogueLink = By.cssSelector("#subtab-AdminCatalog");
-//    private By productLink = By.cssSelector("#subtab-AdminProducts");
+    //    private By productLink = By.cssSelector("#subtab-AdminProducts");
     private By productLink = By.xpath("//nav//li[4]//li[1]/a");
     private By addProductButton = By.id("page-header-desc-configuration-add");
     private By nameProductLocator = By.id("form_step1_name_1");
@@ -30,6 +30,8 @@ public class GeneralActions extends BaseTest{
     private By priceProductLocator = By.id("form_step1_price_shortcut");
     private By pageBody = By.xpath("//body");
     private By frontendAllProductLink = By.xpath("//a[contains(@class, 'all-product')]");
+
+    private static ProductData actionsProductData;
 
     public GeneralActions(WebDriver driver) {
         this.driver = driver;
@@ -49,19 +51,21 @@ public class GeneralActions extends BaseTest{
     }
 
     public void createProduct(ProductData newProduct) throws InterruptedException {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(catalogueLink));
+        actionsProductData = newProduct;
+        waitForContentLoad(catalogueLink);
         WebElement catalogueLink = driver.findElement(this.catalogueLink);
-        WebElement productLink = driver.findElement(this.productLink);
 
         log ("Click the 'Product' item in main menu");
         Actions actions = new Actions(driver);
         actions.moveToElement(catalogueLink).perform();
-        Thread.sleep(2000);
+
+        log ("Click the 'Product Link' item in main menu");
+        WebElement productLink = driver.findElement(this.productLink);
         actions.moveToElement(productLink).perform();
         productLink.click();
 
         //check that product page is displayed
-        wait.until(ExpectedConditions.presenceOfElementLocated(addProductButton));
+        waitForContentLoad(addProductButton);
 
         //create new product
         driver.findElement(addProductButton).click();
@@ -70,20 +74,15 @@ public class GeneralActions extends BaseTest{
         // enter data of product
 
         WebElement productQtyField = driver.findElement(quantityProductLocator);
-        log("cleare field");
         productQtyField.sendKeys(Keys.BACK_SPACE);
-        log("Send keys");
         productQtyField.sendKeys(newProduct.getQty().toString());
 
         WebElement productNameField = driver.findElement(nameProductLocator);
-        log("Send keys");
         productNameField.sendKeys(newProduct.getName());
 
         WebElement productPriceField = driver.findElement(priceProductLocator);
-        log("cleare field");
         productPriceField.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         productPriceField.sendKeys(Keys.BACK_SPACE);
-        log("Send keys");
         productPriceField.sendKeys(newProduct.getPrice());
 
         //activate the product on the site
@@ -98,7 +97,9 @@ public class GeneralActions extends BaseTest{
 
         //check that confirm message is displayed
         Assert.assertEquals(driver.findElement(By.className("growl-message")).getText(), "Настройки обновлены.","wrong text of message");
+    }
 
+    public void checkProductAttributes (){
         //Check the product on the site
         log("log in the the frontend");
         driver.navigate().to(Properties.getBaseUrl());
@@ -116,7 +117,7 @@ public class GeneralActions extends BaseTest{
         log("find the created product on the site");
         WebElement searchField = driver.findElement(By.className("ui-autocomplete-input"));
         log("enter name");
-        searchField.sendKeys(newProduct.getName());
+        searchField.sendKeys(actionsProductData.getName());
         log("press enter");
         //searchField.sendKeys(Keys.ENTER);
         driver.findElement(By.xpath("//button/i")).click();
@@ -130,19 +131,17 @@ public class GeneralActions extends BaseTest{
 
         log("Check the attributes of product");
         //check the attributes of product
-        Assert.assertEquals(driver.findElement(By.xpath("//h1[@class='h3 product-title']/a")).getText(), newProduct.getName(), "Wrong name of product");
-        WebElement priceAtribute = driver.findElement(By.xpath("//div[@class='product-price-and-shipping']/span"));
-        String priceAttribute1 = priceAtribute.getText();
-        System.out.print(priceAttribute1);
+        Assert.assertEquals(driver.findElement(By.xpath("//h1[@class='h3 product-title']/a")).getText(), actionsProductData.getName(), "Wrong name of product");
+        WebElement priceAttribute = driver.findElement(By.xpath("//div[@class='product-price-and-shipping']/span"));
+        String priceAttribute1 = priceAttribute.getText();
 
-        Assert.assertSame(priceAttribute1, newProduct.getPrice(), "Wrong product price");
+        Assert.assertEquals(cutString(priceAttribute1), actionsProductData.getPrice(), "Wrong product price");
     }
-
     public void waitForContentLoad(By locator) {
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
-    public String cutString (String locator){
-       return locator.substring(0, - 2);
+    public String cutString (String price){
+        return price.substring(0, (price.length() - 2));
     }
 }

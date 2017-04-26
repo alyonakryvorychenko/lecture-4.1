@@ -1,6 +1,7 @@
 package myprojects.automation.assignment4.tests;
 
 import myprojects.automation.assignment4.BaseTest;
+import myprojects.automation.assignment4.GeneralActions;
 import myprojects.automation.assignment4.model.ProductData;
 import org.openqa.selenium.By;
 import org.testng.Assert;
@@ -8,6 +9,8 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class CreateProductTest extends BaseTest {
+
+    GeneralActions generalActions;
 
     @DataProvider(name = "credentials")
     public Object[][] loginToAdmin() {
@@ -27,7 +30,11 @@ public class CreateProductTest extends BaseTest {
         actions.createProduct(ProductData.generate());
     }
 
-
+    @Test (dependsOnMethods = {"createNewProduct"})
+    public void checkProductFrontend (){
+        generalActions = new GeneralActions(driver);
+        generalActions.checkProductAttributes();
+    }
 
 
 }
