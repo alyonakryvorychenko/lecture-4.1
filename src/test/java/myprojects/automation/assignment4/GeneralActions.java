@@ -1,6 +1,5 @@
 package myprojects.automation.assignment4;
 
-import com.sun.javafx.scene.KeyboardShortcutsHandler;
 import myprojects.automation.assignment4.model.ProductData;
 import myprojects.automation.assignment4.utils.Properties;
 import myprojects.automation.assignment4.utils.logging.CustomReporter;
@@ -13,16 +12,15 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
-
 /**
  * Contains main script actions that may be used in scripts.
  */
 public class GeneralActions extends BaseTest{
     private WebDriver driver;
     private WebDriverWait wait;
+    private By loginLocator = By.id("email");
+    private By passwordLocator = By.id("passwd");
     private By catalogueLink = By.cssSelector("#subtab-AdminCatalog");
-    //    private By productLink = By.cssSelector("#subtab-AdminProducts");
     private By productLink = By.xpath("//nav//li[4]//li[1]/a");
     private By addProductButton = By.id("page-header-desc-configuration-add");
     private By nameProductLocator = By.id("form_step1_name_1");
@@ -30,7 +28,6 @@ public class GeneralActions extends BaseTest{
     private By priceProductLocator = By.id("form_step1_price_shortcut");
     private By pageBody = By.xpath("//body");
     private By frontendAllProductLink = By.xpath("//a[contains(@class, 'all-product')]");
-
     private static ProductData actionsProductData;
 
     public GeneralActions(WebDriver driver) {
@@ -43,8 +40,10 @@ public class GeneralActions extends BaseTest{
         CustomReporter.log("Login as user" + login);
 
         driver.navigate().to(Properties.getBaseAdminUrl());
-        driver.findElement(By.id("email")).sendKeys(login);
-        driver.findElement(By.id("passwd")).sendKeys(password);
+        WebElement inputLogin = driver.findElement(loginLocator);
+        inputLogin.sendKeys(login);
+        WebElement inputPassword = driver.findElement(passwordLocator);
+        inputPassword.sendKeys(password);
         driver.findElement(By.name("submitLogin")).click();
 
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("main")));

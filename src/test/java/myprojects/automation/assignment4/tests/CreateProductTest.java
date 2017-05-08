@@ -32,7 +32,6 @@ public class CreateProductTest extends BaseTest {
 
     @Test (dependsOnMethods = {"createNewProduct"})
     public void checkProductFrontend (){
-        generalActions = new GeneralActions(driver);
         generalActions.checkProductAttributes();
     }
 
